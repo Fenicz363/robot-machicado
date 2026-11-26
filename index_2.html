@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
 <meta name="theme-color" content="#0f1b2d">
 <meta name="color-scheme" content="dark">
-<title>Robot Control</title>
+<title>Machicado</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🤖%3C/text%3E%3C/svg%3E">
 <style>
 :root{--ink:#0f1b2d;--panel:#18283f;--panel2:#20344f;--line:#2c4466;--txt:#eef3fa;--mut:#8ea3bf;
@@ -70,7 +70,7 @@ details .chk{display:flex;gap:8px;align-items:center}
 <body>
 <main>
   <header>
-    <div><h1>Robot Control</h1><small>FutCar · Globo Smash</small></div>
+    <div><h1>Machicado</h1><small>FutCar · Globo Smash</small></div>
     <button id="conn">Conectar</button>
   </header>
   <div class="pill" id="pill"><i></i><span id="status">Desconectado</span></div>
@@ -115,9 +115,9 @@ details .chk{display:flex;gap:8px;align-items:center}
 </main>
 
 <script>
-const STORAGE_KEY = "cfg_c3_v3";
-const DEFAULTS = { name: "Robot_C3_2Servos", service: "4fafc201-1fb5-459e-8fcc-c5c9c331914b", all: true };
-const CHAR_UUID = "beb5483e-36e1-4688-b7f5-ea07361b26a8";
+const STORAGE_KEY = "cfg_machicado_fixed_v3";
+const DEFAULTS = { name: "Robot_Machicado", service: "8a4e1001-6c3b-4d9a-9f12-3b7c8e901a01", all: false };
+const CHAR_UUID = "8a4e1002-6c3b-4d9a-9f12-3b7c8e901a01";
 const FIXED_SPEED = 255, CLAMP_MS = 3000, COOLDOWN_MS = 500, HOME = 90;
 
 const NAMES = { w:"Adelante", s:"Atrás", a:"Izquierda", d:"Derecha", q:"Adelante-Izquierda", e:"Adelante-Derecha",
@@ -165,9 +165,9 @@ async function connect() {
   setConn("connecting");
   try {
     const cleanName = (cfg.name || "").trim();
-    const opts = (cfg.all || !cleanName)
+    const opts = cfg.all
       ? { acceptAllDevices: true, optionalServices: [cfg.service] }
-      : { filters: [{ name: cleanName }], optionalServices: [cfg.service] };
+      : { filters: [{ services: [cfg.service] }], optionalServices: [cfg.service] };
     dev = await navigator.bluetooth.requestDevice(opts);
     dev.addEventListener("gattserverdisconnected", () => { ch = null; writeFn = null; setConn("disconnected", "Conexión cerrada"); log("Conexión cerrada"); });
     const srv = await dev.gatt.connect();
@@ -184,7 +184,7 @@ async function connect() {
     send("v" + String(FIXED_SPEED).padStart(3, "0"));
     send("g" + String(HOME).padStart(3, "0"));
     servoSent = HOME; setServo(HOME);
-    log("Conectado a " + (dev.name || cleanName) + ". Velocidad " + FIXED_SPEED + ", servo " + HOME + "°.");
+    log("Conectado a " + (dev.name || cleanName) + ".");
     try { wake = await navigator.wakeLock.request("screen"); } catch (e) {}
   } catch (e) {
     let m = e.message || e.name;
@@ -329,4 +329,4 @@ applyMode(); setConn("disconnected");
 log("Listo. Enciende el robot y toca «Conectar».");
 </script>
 </body>
-                                                                                                                    </html>
+</html>
